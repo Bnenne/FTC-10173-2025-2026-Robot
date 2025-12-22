@@ -48,7 +48,7 @@ public class LED {
     }
 
     // update LED pattern based on shooter state
-    public void update() {
+    public void periodic() {
         /*
          * 0 - (idle) solid hot pink
          * 1 - (flywheel spin up) slow flash hot pink

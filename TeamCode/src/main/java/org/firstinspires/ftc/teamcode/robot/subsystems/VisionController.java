@@ -21,6 +21,8 @@ public class VisionController {
         public static int RED_ID = 24;
     }
 
+    public double distance, bearing;
+
     AprilTagProcessor aprilTagProcessor;
     VisionPortal visionPortal;
     int exposure, gain;
@@ -42,6 +44,15 @@ public class VisionController {
         // set default exposure and gain
         exposure = 100;
         gain = 1;
+    }
+
+    public void periodic() {
+        // set manual exposure and gain
+        setManualExposure();
+
+        // get distance and bearing to tag
+        distance = getDistance(0);
+        bearing = getBearing(0);
     }
 
     // get distance to tag with specified ID

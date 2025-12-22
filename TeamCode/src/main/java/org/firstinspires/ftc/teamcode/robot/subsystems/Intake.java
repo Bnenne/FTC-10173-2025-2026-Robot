@@ -9,21 +9,36 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.robot.DriverControls;
+
 public class Intake {
 
     Motor intakeMotor;
     CRServo feederServo;
+    DriverControls controls;
     LED led;
 
     // constructor
-    public Intake(HardwareMap hardwareMap, LED ledSubsystem) {
+    public Intake(HardwareMap hardwareMap, DriverControls controls, LED ledSubsystem) {
         // initialize motors and servos
         intakeMotor = new Motor(hardwareMap, "intake", Motor.GoBILDA.RPM_435);
         intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         feederServo = new CRServo(hardwareMap, "feeder");
 
+        // store driver controls
+        this.controls = controls;
+
         // LED subsystem
         led = ledSubsystem;
+    }
+
+    public void periodic() {
+        // set intake and feeder power based on driver controls
+        setPower(
+                controls.intakePower(),
+                controls.fullIntakePressed(),
+                controls.topOuttakePressed()
+        );
     }
 
     // set intake and feeder power

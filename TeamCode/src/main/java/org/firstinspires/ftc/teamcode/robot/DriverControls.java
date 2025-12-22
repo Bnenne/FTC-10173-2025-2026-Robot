@@ -27,7 +27,7 @@ public class DriverControls {
         return driver.getButton(GamepadKeys.Button.RIGHT_BUMPER);
     }
 
-    public boolean halfOuttakePressed() {
+    public boolean topOuttakePressed() {
         return driver.getButton(GamepadKeys.Button.B);
     }
 

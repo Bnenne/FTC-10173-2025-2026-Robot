@@ -9,8 +9,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.arcrobotics.ftclib.hardware.motors.MotorGroup;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 
+import org.firstinspires.ftc.teamcode.robot.DriverControls;
+
 public class Shooter {
     public MotorGroup flywheel;
+    DriverControls controls;
+    VisionController vision;
     public Double power = 0.5;
     double targetVel = 1200;
     LED led;
@@ -26,7 +30,7 @@ public class Shooter {
     }
 
     // constructor
-    public Shooter(HardwareMap hardwareMap, LED ledSubsystem) {
+    public Shooter(HardwareMap hardwareMap, DriverControls controls, LED ledSubsystem, VisionController vision) {
         // initialize motors as a motor group
         flywheel = new MotorGroup(
                 new Motor(hardwareMap, "flywheel_left", Motor.GoBILDA.BARE),
@@ -42,8 +46,22 @@ public class Shooter {
         flywheel.setVeloCoefficients(Params.kP, Params.kI, Params.kD);
         flywheel.setFeedforwardCoefficients(Params.kS, Params.kV, Params.kA);
 
+        // store driver controls
+        this.controls = controls;
+
+        // store vision controller
+        this.vision = vision;
+
         // LED subsystem
         led = ledSubsystem;
+    }
+
+    public void periodic() {
+        // adjust power based on tag distance
+        setPower(vision.distance);
+
+        // set flywheel spin based on driver controls
+        spin(controls.spinShooterPressed());
     }
 
     // set flywheel power and update LED status
@@ -104,9 +122,6 @@ public class Shooter {
                     led.spinningUp = true;
                     led.shooterReady = vel >= (targetVel - 20);
                 }
-
-                // update LEDs
-                led.update();
 
                 // run indefinitely
                 return true;

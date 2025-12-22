@@ -11,18 +11,27 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.robot.DriverControls;
 
 public class Drive {
 
     MecanumDrive drive;
+    DriverControls controls;
+    VisionController vision;
     IMU imu;
     double lock_turn;
     PIDController pid;
 
     // constructor
-    public Drive(HardwareMap hardwareMap) {
+    public Drive(HardwareMap hardwareMap, DriverControls controls, VisionController vision) {
         // initialize drive with starting pose at origin
         drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+
+        // store driver controls
+        this.controls = controls;
+
+        // store vision controller
+        this.vision = vision;
 
         // initialize imu
         imu = hardwareMap.get(IMU.class, "imu");
@@ -36,6 +45,25 @@ public class Drive {
         pid = new PIDController(
             0.02, 0.0, 0.0
         );
+    }
+
+    public void periodic() {
+        // reset yaw if requested
+        if (controls.resetYawPressed()) {
+            resetYaw();
+        }
+
+        // update heading lock
+        lock(vision.bearing);
+
+        // set drive powers based on driver controls
+        setDrivePowers(
+                controls.driver,
+                controls.lockDrivePressed()
+        );
+
+        // update drive pose estimate
+        drive.updatePoseEstimate();
     }
 
     // set drive powers based on field-centric controls

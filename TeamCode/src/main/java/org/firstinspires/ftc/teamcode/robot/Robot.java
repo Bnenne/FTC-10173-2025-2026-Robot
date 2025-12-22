@@ -15,11 +15,11 @@ public class Robot {
     public final LED led;
     public final VisionController vision;
 
-    public Robot(HardwareMap hardwareMap) {
+    public Robot(HardwareMap hardwareMap, DriverControls controls) {
         led = new LED(hardwareMap);
-        shooter = new Shooter(hardwareMap, led);
-        intake = new Intake(hardwareMap, led);
-        drive = new Drive(hardwareMap);
         vision = new VisionController(hardwareMap);
+        shooter = new Shooter(hardwareMap, controls, led, vision);
+        intake = new Intake(hardwareMap, controls, led);
+        drive = new Drive(hardwareMap, controls, vision);
     }
 }
