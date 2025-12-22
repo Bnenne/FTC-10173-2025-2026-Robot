@@ -19,10 +19,10 @@ public class RobotContainer {
     }
 
     public void periodic() {
-        robot.drive.periodic();
-        robot.intake.periodic();
-        robot.shooter.periodic();
-        robot.led.periodic();
         robot.vision.periodic();
+        robot.drive.periodic();
+        robot.shooter.periodic();
+        robot.intake.periodic();
+        robot.led.periodic();
     }
 }
