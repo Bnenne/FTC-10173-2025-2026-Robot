@@ -41,13 +41,32 @@ public class RobotContainer {
         robot.intake.periodic();
         robot.led.periodic();
 
-        // Send telemetry data
+        // Update state based on subsystem activities
+        if (controls.spinShooterPressed()) {
+            currentState = RobotState.SHOOTING;
+        } else if (controls.intakePower() > 0 || controls.fullIntakePressed()) {
+            currentState = RobotState.INTAKING;
+        } else if (controls.lockDrivePressed()) {
+            currentState = RobotState.ALIGNING;
+        } else {
+            currentState = RobotState.IDLE;
+        }
+
+        /* Update telemetry with robot status */
+
+        // Robot state
+        telemetry.addData("Robot State", currentState);
+
+        // Pose information
         telemetry.addData("Pose X", robot.drive.getPose().position.x);
         telemetry.addData("Pose Y", robot.drive.getPose().position.y);
         telemetry.addData("Pose Heading", robot.drive.getPose().heading.real);
 
+        // Vision data
         telemetry.addData("Distance", robot.vision.distance);
         telemetry.addData("Bearing", robot.vision.bearing);
+
+        // Shooter data
         telemetry.addData("Shooter Power", robot.shooter.power);
         telemetry.addData("Target Vel", robot.shooter.targetVel);
     }
