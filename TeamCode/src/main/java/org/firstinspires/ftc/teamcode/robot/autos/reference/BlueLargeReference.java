@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.robot.subsystems.LED;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Shooter;
@@ -29,9 +30,7 @@ public final class BlueLargeReference extends LinearOpMode {
         if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) {
             MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
-            LED led = new LED(hardwareMap);
-            Shooter shooter = new Shooter(hardwareMap, led);
-            Intake intake = new Intake(hardwareMap);
+            Robot robot = new Robot(hardwareMap);
 
             waitForStart();
 
@@ -44,9 +43,9 @@ public final class BlueLargeReference extends LinearOpMode {
                                                     .strafeToLinearHeading(new Vector2d(-18, -18), Math.toRadians(225))
                                                     .build(),
                                             new SequentialAction(
-                                                    shooter.spinUp(0.43, 0.5),
-                                                    intake.feed(1, 10000),
-                                                    shooter.spinUp(0.0, -1)
+                                                    robot.shooter.spinUp(0.43, 0.5),
+                                                    robot.intake.feed(1, 10000),
+                                                    robot.shooter.spinUp(0.0, -1)
                                             )
                                     ),
 
@@ -56,11 +55,11 @@ public final class BlueLargeReference extends LinearOpMode {
                                             .build(),
 
                                     // intake artifacts
-                                    intake.intake(1),
+                                    robot.intake.intake(1),
                                     drive.actionBuilder(new Pose2d(-12, -18, Math.toRadians(270)))
                                             .strafeToLinearHeading(new Vector2d(-12, -54), Math.toRadians(270), new TranslationalVelConstraint(25))
                                             .build(),
-                                    intake.intake(0),
+                                    robot.intake.intake(0),
 
                                     // move and shoot
                                     new ParallelAction(
@@ -68,9 +67,9 @@ public final class BlueLargeReference extends LinearOpMode {
                                                     .strafeToLinearHeading(new Vector2d(-18, -18), Math.toRadians(225))
                                                     .build(),
                                             new SequentialAction(
-                                                    shooter.spinUp(0.43, 0.5),
-                                                    intake.feed(1, 10000),
-                                                    shooter.spinUp(0.0, -1)
+                                                    robot.shooter.spinUp(0.43, 0.5),
+                                                    robot.intake.feed(1, 10000),
+                                                    robot.shooter.spinUp(0.0, -1)
                                             )
                                     ),
 
@@ -80,11 +79,11 @@ public final class BlueLargeReference extends LinearOpMode {
                                             .build(),
 
                                     // intake artifacts
-                                    intake.intake(1),
+                                    robot.intake.intake(1),
                                     drive.actionBuilder(new Pose2d(12, -18, Math.toRadians(270)))
                                             .strafeToLinearHeading(new Vector2d(12, -54), Math.toRadians(270), new TranslationalVelConstraint(25))
                                             .build(),
-                                    intake.intake(0),
+                                    robot.intake.intake(0),
 
                                     // move and shoot
                                     new ParallelAction(
@@ -92,9 +91,9 @@ public final class BlueLargeReference extends LinearOpMode {
                                                     .strafeToLinearHeading(new Vector2d(-18, -18), Math.toRadians(225))
                                                     .build(),
                                             new SequentialAction(
-                                                    shooter.spinUp(0.43, 0.5),
-                                                    intake.feed(1, 10000),
-                                                    shooter.spinUp(0.0, -1)
+                                                    robot.shooter.spinUp(0.43, 0.5),
+                                                    robot.intake.feed(1, 10000),
+                                                    robot.shooter.spinUp(0.0, -1)
                                             )
                                     ),
 
@@ -104,11 +103,11 @@ public final class BlueLargeReference extends LinearOpMode {
                                             .build(),
 
                                     // intake artifacts
-                                    intake.intake(1),
+                                    robot.intake.intake(1),
                                     drive.actionBuilder(new Pose2d(36, -18, Math.toRadians(270)))
                                             .strafeToLinearHeading(new Vector2d(36, -54), Math.toRadians(270), new TranslationalVelConstraint(25))
                                             .build(),
-                                    intake.intake(0),
+                                    robot.intake.intake(0),
 
                                     // move and shoot
                                     new ParallelAction(
@@ -116,13 +115,13 @@ public final class BlueLargeReference extends LinearOpMode {
                                                     .strafeToLinearHeading(new Vector2d(-18, -18), Math.toRadians(225))
                                                     .build(),
                                             new SequentialAction(
-                                                    shooter.spinUp(0.43, 0.5),
-                                                    intake.feed(1, 10000),
-                                                    shooter.spinUp(0.0, -1)
+                                                    robot.shooter.spinUp(0.43, 0.5),
+                                                    robot.intake.feed(1, 10000),
+                                                    robot.shooter.spinUp(0.0, -1)
                                             )
                                     )
                             ),
-                            shooter.maintainVelocity()
+                            robot.shooter.maintainVelocity()
                     )
             );
         } else {

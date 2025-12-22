@@ -10,9 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.robot.subsystems.LED;
-import org.firstinspires.ftc.teamcode.robot.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.tuning.TuningOpModes;
 
 @Autonomous(name="BlueLarge", group="2025-2026")
@@ -26,10 +24,7 @@ public final class BlueLarge extends LinearOpMode {
         if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) {
             MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
-            // subsystems
-            LED led = new LED(hardwareMap);
-            Shooter shooter = new Shooter(hardwareMap, led);
-            Intake intake = new Intake(hardwareMap);
+            Robot robot = new Robot(hardwareMap);
 
             waitForStart();
 
@@ -42,9 +37,9 @@ public final class BlueLarge extends LinearOpMode {
                                                     .strafeToLinearHeading(new Vector2d(-18, -18), Math.toRadians(225))
                                                     .build(),
                                             new SequentialAction(
-                                                    shooter.spinUp(0.41, 0.5),
-                                                    intake.feed(1, 8500),
-                                                    shooter.spinUp(0.0, -1)
+                                                    robot.shooter.spinUp(0.41, 0.5),
+                                                    robot.intake.feed(1, 8500),
+                                                    robot.shooter.spinUp(0.0, -1)
                                             )
                                     ),
 
@@ -54,11 +49,11 @@ public final class BlueLarge extends LinearOpMode {
                                             .build(),
 
                                     // intake artifacts
-                                    intake.intake(1),
+                                    robot.intake.intake(1),
                                     drive.actionBuilder(new Pose2d(-7, -18, Math.toRadians(279)))
                                             .strafeToLinearHeading(new Vector2d(-7, -55), Math.toRadians(279), new TranslationalVelConstraint(17.5))
                                             .build(),
-                                    intake.intake(0),
+                                    robot.intake.intake(0),
 
                                     // move and shoot
                                     new ParallelAction(
@@ -66,9 +61,9 @@ public final class BlueLarge extends LinearOpMode {
                                                     .strafeToLinearHeading(new Vector2d(-18, -18), Math.toRadians(215))
                                                     .build(),
                                             new SequentialAction(
-                                                    shooter.spinUp(0.41, 0.75),
-                                                    intake.feed(1, 22500),
-                                                    shooter.spinUp(0.0, -1)
+                                                    robot.shooter.spinUp(0.41, 0.75),
+                                                    robot.intake.feed(1, 22500),
+                                                    robot.shooter.spinUp(0.0, -1)
                                             )
                                     ),
 
@@ -77,7 +72,7 @@ public final class BlueLarge extends LinearOpMode {
                                             .strafeToLinearHeading(new Vector2d(-48, -18), Math.toRadians(180))
                                             .build()
                             ),
-                            shooter.maintainVelocity()
+                            robot.shooter.maintainVelocity()
                     )
             );
         } else {

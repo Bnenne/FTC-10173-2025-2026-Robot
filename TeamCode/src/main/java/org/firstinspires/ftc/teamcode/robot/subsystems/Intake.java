@@ -13,13 +13,17 @@ public class Intake {
 
     Motor intakeMotor;
     CRServo feederServo;
+    LED led;
 
     // constructor
-    public Intake(HardwareMap hardwareMap) {
+    public Intake(HardwareMap hardwareMap, LED ledSubsystem) {
         // initialize motors and servos
         intakeMotor = new Motor(hardwareMap, "intake", Motor.GoBILDA.RPM_435);
         intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         feederServo = new CRServo(hardwareMap, "feeder");
+
+        // LED subsystem
+        led = ledSubsystem;
     }
 
     // set intake and feeder power

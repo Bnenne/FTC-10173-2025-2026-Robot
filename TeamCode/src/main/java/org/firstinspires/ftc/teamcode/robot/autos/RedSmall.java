@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.robot.subsystems.LED;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Shooter;
@@ -26,11 +27,7 @@ public final class RedSmall extends LinearOpMode {
         if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) {
             MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
-            // subsystems
-            LED led = new LED(hardwareMap);
-            Shooter shooter = new Shooter(hardwareMap, led);
-            Intake intake = new Intake(hardwareMap);
-
+            Robot robot = new Robot(hardwareMap);
             waitForStart();
 
             Actions.runBlocking(
@@ -42,9 +39,9 @@ public final class RedSmall extends LinearOpMode {
                                                     .strafeToLinearHeading(new Vector2d(52, 16), Math.toRadians(180-24))
                                                     .build(),
                                             new SequentialAction(
-                                                    shooter.spinUp(0.49, 0.5),
-                                                    intake.feed(1, 10000),
-                                                    shooter.spinUp(0.0, -1)
+                                                    robot.shooter.spinUp(0.49, 0.5),
+                                                    robot.intake.feed(1, 10000),
+                                                    robot.shooter.spinUp(0.0, -1)
                                             )
                                     ),
 
@@ -54,11 +51,11 @@ public final class RedSmall extends LinearOpMode {
                                             .build(),
 
                                     // intake artifacts
-                                    intake.intake(1),
+                                    robot.intake.intake(1),
                                     drive.actionBuilder(new Pose2d(33, 18, Math.toRadians(180-85)))
                                             .strafeToLinearHeading(new Vector2d(33, 60), Math.toRadians(180-90), new TranslationalVelConstraint(25))
                                             .build(),
-                                    intake.intake(0),
+                                    robot.intake.intake(0),
 
                                     // move and shoot
                                     new ParallelAction(
@@ -66,9 +63,9 @@ public final class RedSmall extends LinearOpMode {
                                                     .strafeToLinearHeading(new Vector2d(52, 13), Math.toRadians(180-6))
                                                     .build(),
                                             new SequentialAction(
-                                                    shooter.spinUp(0.49, 0.75),
-                                                    intake.feed(1, 22500),
-                                                    shooter.spinUp(0.0, -1)
+                                                    robot.shooter.spinUp(0.49, 0.75),
+                                                    robot.intake.feed(1, 22500),
+                                                    robot.shooter.spinUp(0.0, -1)
                                             )
                                     ),
 
@@ -77,7 +74,7 @@ public final class RedSmall extends LinearOpMode {
                                             .strafeToLinearHeading(new Vector2d(40, 13), Math.toRadians(180-6))
                                             .build()
                             ),
-                            shooter.maintainVelocity()
+                            robot.shooter.maintainVelocity()
                     )
             );
         } else {
