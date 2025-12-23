@@ -104,6 +104,7 @@ public class Drive implements Subsystem {
         telemetry.addData(getName() + " X", "%.2f Inches", pose.position.x);
         telemetry.addData(getName() + " Y", "%.2f Inches", pose.position.x);
         telemetry.addData(getName() + " Heading", "%.2f Degrees", Math.toDegrees(pose.heading.real));
+        telemetry.addData(getName() + " IMU Yaw", "%.2f Degrees", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
         telemetry.addData(getName() + " Healthy", isHealthy());
     }
 
