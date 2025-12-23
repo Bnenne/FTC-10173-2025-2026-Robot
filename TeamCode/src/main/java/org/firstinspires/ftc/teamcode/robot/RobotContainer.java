@@ -23,9 +23,10 @@ public class RobotContainer {
      * Configure button bindings for driver controls
      */
     private void configureBindings() {
-        // Reset robot yaw when BACK button is pressed
-        controls.driver.getGamepadButton(GamepadKeys.Button.BACK)
-                .whenPressed(robot.drive::resetYaw);
+//        Does not work properly right now, currently working in the drive periodic method
+//        // Reset robot yaw when BACK button is pressed
+//        controls.driver.getGamepadButton(GamepadKeys.Button.BACK)
+//                .whenPressed(robot.drive::resetYaw);
     }
 
     /**

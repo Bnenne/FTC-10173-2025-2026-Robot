@@ -10,6 +10,10 @@ public class DriverControls {
         this.driver = driver;
     }
 
+    public boolean imuResetPressed() {
+        return driver.getButton(GamepadKeys.Button.BACK);
+    }
+
     /**
      * Lock heading to goal command
      */

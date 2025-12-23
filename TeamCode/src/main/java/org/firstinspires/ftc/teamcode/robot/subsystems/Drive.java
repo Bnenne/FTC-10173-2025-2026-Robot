@@ -76,6 +76,10 @@ public class Drive implements Subsystem {
 
     // periodic method to be called in main loop
     public void periodic() {
+        if (controls.imuResetPressed()) {
+            resetYaw();
+        }
+
         // update heading lock
         if (controls.lockDrivePressed()) {
             lock(vision.bearing);
