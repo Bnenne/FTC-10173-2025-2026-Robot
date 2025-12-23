@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -76,10 +77,6 @@ public class Drive implements Subsystem {
 
     // periodic method to be called in main loop
     public void periodic() {
-        if (controls.imuResetPressed()) {
-            resetYaw();
-        }
-
         // update heading lock
         if (controls.lockDrivePressed()) {
             lock(vision.bearing);

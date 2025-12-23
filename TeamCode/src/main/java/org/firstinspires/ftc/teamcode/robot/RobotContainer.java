@@ -25,16 +25,17 @@ public class RobotContainer {
     private void configureBindings() {
 //        Does not work properly right now, currently working in the drive periodic method
 //        // Reset robot yaw when BACK button is pressed
-//        controls.driver.getGamepadButton(GamepadKeys.Button.BACK)
-//                .whenPressed(robot.drive::resetYaw);
+        controls.driver.getGamepadButton(GamepadKeys.Button.BACK)
+                .whenPressed(robot.drive::resetYaw);
     }
 
     /**
      * Periodic method to be called in main op mode loop
      */
     public void periodic(Telemetry telemetry) {
-        robot.periodicAll();
+        controls.driver.readButtons();
 
+        robot.periodicAll();
         robotState.periodic();
 
         updateTelemetry(telemetry);
@@ -50,5 +51,10 @@ public class RobotContainer {
         telemetry.addLine();
 
         robot.telemetryUpdateAll(telemetry);
+    }
+
+    public void onStop() {
+        robot.stopAll();
+        robotState.set(RobotState.State.IDLE);
     }
 }

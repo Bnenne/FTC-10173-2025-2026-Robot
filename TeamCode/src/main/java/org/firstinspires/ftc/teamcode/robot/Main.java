@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -17,7 +16,10 @@ public class Main extends LinearOpMode {
 
         while (opModeIsActive()) {
             container.periodic(telemetry);
-//            telemetry.update();
+            telemetry.update();
         }
+
+        // Stop all subsystems
+        container.onStop();
     }
 }
