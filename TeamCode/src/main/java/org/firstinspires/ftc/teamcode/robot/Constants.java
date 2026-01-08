@@ -8,6 +8,16 @@ public class Constants {
         public static final double HEADING_KD = 0.0;
     }
 
+    public static class Gate {
+        public static final double MIN_ANGLE = 0;
+        public static final double MAX_ANGLE = 90;
+    }
+
+    public static class Hood {
+        public static final double MIN_ANGLE = 0;
+        public static final double MAX_ANGLE = 90;
+    }
+
     public static class Shooter {
         // Shooter velocity control constants
         public static final double SCALE = 670;
