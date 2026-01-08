@@ -1,21 +1,28 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
+import static org.firstinspires.ftc.teamcode.robot.Constants.Hood.MAX_ANGLE;
+import static org.firstinspires.ftc.teamcode.robot.Constants.Hood.MIN_ANGLE;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.arcrobotics.ftclib.hardware.ServoEx;
+import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import com.arcrobotics.ftclib.hardware.motors.MotorGroup;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.robot.Constants;
 import org.firstinspires.ftc.teamcode.robot.DriverControls;
 import org.firstinspires.ftc.teamcode.robot.RobotState;
 
 public class Shooter implements Subsystem {
     public MotorGroup flywheel;
+    ServoEx hood;
     DriverControls controls;
     RobotState robotState;
     Vision vision;
@@ -51,6 +58,15 @@ public class Shooter implements Subsystem {
                 Constants.Shooter.kV,
                 Constants.Shooter.kA
         );
+
+        // initialize hood servo
+        hood = new SimpleServo(
+                hardwareMap, "servo_name", MIN_ANGLE, MAX_ANGLE, AngleUnit.DEGREES
+        );
+
+        // configure hood servo
+        hood.setInverted(false);
+        hood.setPosition(0);
 
         // store driver controls
         this.controls = controls;
@@ -91,6 +107,15 @@ public class Shooter implements Subsystem {
                 Constants.Shooter.kA
         );
 
+        // initialize hood servo
+        hood = new SimpleServo(
+                hardwareMap, "servo_name", MIN_ANGLE, MAX_ANGLE, AngleUnit.DEGREES
+        );
+
+        // configure hood servo
+        hood.setInverted(false);
+        hood.setPosition(0);
+
         // store robot state
         this.robotState = robotState;
 
@@ -121,6 +146,7 @@ public class Shooter implements Subsystem {
         telemetry.addData(getName() + " Power", "%.2f", power);
         telemetry.addData(getName() + " Target", "%.0f", targetVel);
         telemetry.addData(getName() + " Current", "%.0f", flywheel.getVelocity());
+        telemetry.addData(getName() + " Hood Angle", "%.0f", hood.getAngle(AngleUnit.DEGREES));
         telemetry.addData(getName() + " Ready", robotState.shooterReady);
         telemetry.addData(getName() + " Healthy", isHealthy());
     }
@@ -130,7 +156,7 @@ public class Shooter implements Subsystem {
     public boolean isHealthy() {
         // Check if motors are connected and responding
         // Could add more sophisticated health checks here
-        return flywheel != null;
+        return flywheel != null && hood != null;
     }
 
     // set flywheel power and update LED status
