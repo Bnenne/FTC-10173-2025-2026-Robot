@@ -35,7 +35,7 @@ public class Robot {
         imu.initialize(parameters);
 
         led = new LED(hardwareMap, robotState);
-        limelight = new Limelight(hardwareMap, imu);
+        limelight = new Limelight(hardwareMap, imu).setPipeline(0);
         shooter = new Shooter(hardwareMap, controls, robotState, limelight);
         intake = new Intake(hardwareMap, controls);
         drive = new Drive(hardwareMap, controls, limelight, imu);
@@ -60,7 +60,7 @@ public class Robot {
         imu.initialize(parameters);
 
         led = new LED(hardwareMap, robotState);
-        limelight = new Limelight(hardwareMap, imu);
+        limelight = new Limelight(hardwareMap, imu).setPipeline(0);
         shooter = new Shooter(hardwareMap, robotState, limelight);
         intake = new Intake(hardwareMap);
         drive = new Drive(hardwareMap, limelight, imu);

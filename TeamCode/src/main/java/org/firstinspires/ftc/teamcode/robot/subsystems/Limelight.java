@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.robot.subsystems;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes.FiducialResult;
+import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.List;
@@ -15,16 +17,20 @@ public class Limelight implements Subsystem {
 
     private final Limelight3A limelight;
     private final IMU imu; // Currently unused but may incorporate for more accurate localization
+    private double yawOffset;
 
     private CameraState currentState;
     private int desiredPipeline;
 
-    private LLResult result;
+    private LLStatus llStatus;
 
     public final Results results;
+    public final Botpose botpose;
 
     public enum CameraState {
         IDLE,
+        SEARCHING,
+        TARGETING,
         STOPPED
     }
 
@@ -35,7 +41,14 @@ public class Limelight implements Subsystem {
         public double tx;
         public double ty;
         public double ta;
-        public long stalenessMillis;
+        public LLResult result;
+    }
+
+    /** Bot pose based on vision */
+    public static class Botpose { // TODO: use botpose for localization verification
+        public double x;
+        public double y;
+        public LLResult result; // TODO: use getStaleness() method in localization verification
     }
 
     // Constructor
@@ -51,6 +64,7 @@ public class Limelight implements Subsystem {
 
         currentState = CameraState.IDLE;
         results = new Results();
+        botpose = new Botpose();
     }
 
     /** Fluent pipeline switch */
@@ -62,17 +76,42 @@ public class Limelight implements Subsystem {
 
     @Override
     public void periodic() {
-        result = limelight.getLatestResult();
+        LLResult result = limelight.getLatestResult();
+        llStatus = limelight.getStatus();
 
         if (result == null || !result.isValid()) {
             results.hasTarget = false;
             return;
         }
 
-        if (result.getPipelineIndex() != desiredPipeline) return;
+        if (result.getPipelineIndex() != desiredPipeline) {
+            return;
+        }
 
+        updateBotpose(result);
+        updateResults(result);
+    }
+
+    public void updateBotpose(LLResult result) {
+        double robotYaw = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        limelight.updateRobotOrientation(robotYaw);
+
+        Pose3D botpose_mt2 = result.getBotpose_MT2();
+        if (botpose_mt2 != null) {
+            double botpose_x = botpose_mt2.getPosition().x;
+            double botpose_y = botpose_mt2.getPosition().y;
+
+            botpose.x = botpose_x;
+            botpose.y = botpose_y;
+
+            botpose.result = result;
+        }
+    }
+
+    public void updateResults(LLResult result) {
         List<FiducialResult> fiducials = result.getFiducialResults();
         if (fiducials.isEmpty()) {
+            currentState = CameraState.SEARCHING;
             results.hasTarget = false;
             return;
         }
@@ -89,8 +128,9 @@ public class Limelight implements Subsystem {
         results.distanceMeters = Math.sqrt(x * x + y * y + z * z);
 
         // update auxiliary data
-        results.stalenessMillis = result.getStaleness();
+        results.result = result;
         results.hasTarget = true;
+        currentState = CameraState.TARGETING;
 
         // yaw error to tag
         results.tx = fiducial.getTargetXDegrees();
@@ -102,6 +142,20 @@ public class Limelight implements Subsystem {
     public void updateTelemetry(Telemetry telemetry) {
         telemetry.addLine(); // Separator from other data
         telemetry.addData(getName() + " State", currentState);
+        telemetry.addData(getName() + " Pipeline", "%d", llStatus.getPipelineIndex());
+        telemetry.addData(getName() + " FPS", "%.0f", llStatus.getFps());
+        telemetry.addData(getName() + " RAM", "%.1f", llStatus.getRam());
+        telemetry.addData(getName() + " TEMP", "%.1f", llStatus.getTemp());
+
+        if (botpose.result != null) {
+            telemetry.addData(getName() + "Pose X", "%.1f", botpose.x);
+            telemetry.addData(getName() + "Pose Y", "%.1f", botpose.y);
+            if (botpose.result.getStaleness() < 100) {
+                telemetry.addData(getName() + " Pose Staleness", "FRESH");
+            } else {
+                telemetry.addData(getName() + " Pose Staleness", "STALE");
+            }
+        }
 
         if (results.hasTarget) {
             telemetry.addData(getName() + " Tag Distance (m)", "%.2f", results.distanceMeters);
@@ -109,10 +163,10 @@ public class Limelight implements Subsystem {
             telemetry.addData(getName() + " tx", "%.2f", results.tx);
             telemetry.addData(getName() + " ty", "%.2f", results.ty);
             telemetry.addData(getName() + " ta", "%.2f", results.ta);
-            if (results.stalenessMillis < 100) {
-                telemetry.addData(getName() + " Staleness", "FRESH");
+            if (results.result.getStaleness() < 100) {
+                telemetry.addData(getName() + " Tag Staleness", "FRESH");
             } else {
-                telemetry.addData(getName() + " Staleness", "STALE");
+                telemetry.addData(getName() + " Tag Staleness", "STALE");
             }
             telemetry.addData(getName() + " Healthy", isHealthy());
         } else {
@@ -122,7 +176,7 @@ public class Limelight implements Subsystem {
 
     @Override
     public boolean isHealthy() {
-        return limelight != null && result != null && result.isValid();
+        return limelight.isConnected() && limelight.isRunning();
     }
 
     @Override
