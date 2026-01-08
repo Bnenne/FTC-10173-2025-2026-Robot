@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.robot.subsystems.LED;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.robot.subsystems.Subsystem;
-import org.firstinspires.ftc.teamcode.robot.subsystems.Vision;
+import org.firstinspires.ftc.teamcode.robot.subsystems.vision.Vision;
 
 import java.util.ArrayList;
 import java.util.List;
