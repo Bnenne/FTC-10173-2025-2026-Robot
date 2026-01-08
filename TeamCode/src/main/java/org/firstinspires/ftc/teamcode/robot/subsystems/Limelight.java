@@ -80,11 +80,13 @@ public class Limelight implements Subsystem {
         llStatus = limelight.getStatus();
 
         if (result == null || !result.isValid()) {
+            currentState = CameraState.SEARCHING;
             results.hasTarget = false;
             return;
         }
 
         if (result.getPipelineIndex() != desiredPipeline) {
+            currentState = CameraState.IDLE;
             return;
         }
 
@@ -98,11 +100,8 @@ public class Limelight implements Subsystem {
 
         Pose3D botpose_mt2 = result.getBotpose_MT2();
         if (botpose_mt2 != null) {
-            double botpose_x = botpose_mt2.getPosition().x;
-            double botpose_y = botpose_mt2.getPosition().y;
-
-            botpose.x = botpose_x;
-            botpose.y = botpose_y;
+            botpose.x = botpose_mt2.getPosition().x;
+            botpose.y = botpose_mt2.getPosition().y;
 
             botpose.result = result;
         }
@@ -151,10 +150,11 @@ public class Limelight implements Subsystem {
         if (botpose.result != null) {
             telemetry.addData(getName() + "Pose X", "%.1f", botpose.x);
             telemetry.addData(getName() + "Pose Y", "%.1f", botpose.y);
-            if (botpose.result.getStaleness() < 100) {
-                telemetry.addData(getName() + " Pose Staleness", "FRESH");
+            long staleness = botpose.result.getStaleness();
+            if (staleness < 100) {
+                telemetry.addData(getName() + " Pose Staleness", "FRESH " + staleness + "ms");
             } else {
-                telemetry.addData(getName() + " Pose Staleness", "STALE");
+                telemetry.addData(getName() + " Pose Staleness", "STALE " + staleness + "ms");
             }
         }
 
@@ -164,10 +164,11 @@ public class Limelight implements Subsystem {
             telemetry.addData(getName() + " tx", "%.2f", results.tx);
             telemetry.addData(getName() + " ty", "%.2f", results.ty);
             telemetry.addData(getName() + " ta", "%.2f", results.ta);
-            if (results.result.getStaleness() < 100) {
-                telemetry.addData(getName() + " Tag Staleness", "FRESH");
+            long staleness = botpose.result.getStaleness();
+            if (staleness < 100) {
+                telemetry.addData(getName() + " Tag Staleness", "FRESH " + staleness + "ms");
             } else {
-                telemetry.addData(getName() + " Tag Staleness", "STALE");
+                telemetry.addData(getName() + " Tag Staleness", "STALE " + staleness + "ms");
             }
             telemetry.addData(getName() + " Healthy", isHealthy());
         } else {
