@@ -24,16 +24,22 @@ public class Intake implements Subsystem {
     Motor intakeMotor;
     ServoEx feedGate;
     DriverControls controls;
+    
+    double MIN_ANGLE;
+    double MAX_ANGLE;
 
     // TeleOp constructor
     public Intake(HardwareMap hardwareMap, DriverControls controls) {
         // initialize motor
         intakeMotor = new Motor(hardwareMap, "intake", Motor.GoBILDA.RPM_435);
         intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        
+        MIN_ANGLE = Constants.Gate.MIN_ANGLE;
+        MAX_ANGLE = Constants.Gate.MAX_ANGLE;
 
         // initialize gate servo
         feedGate = new SimpleServo(
-                hardwareMap, "servo_name", Constants.Hood.MIN_ANGLE, Constants.Hood.MAX_ANGLE, AngleUnit.DEGREES
+                hardwareMap, "servo_name", MIN_ANGLE, MAX_ANGLE, AngleUnit.DEGREES
         );
 
         // configure gate servo
@@ -75,7 +81,7 @@ public class Intake implements Subsystem {
 
     public void stop() {
         intakeMotor.set(0);
-        feedGate.turnToAngle(0);
+        feedGate.turnToAngle(MIN_ANGLE);
     }
 
     public void updateTelemetry(Telemetry telemetry) {
@@ -89,16 +95,16 @@ public class Intake implements Subsystem {
     public void setPower(double half, boolean full) {
         if (full) { // full intake
             intakeMotor.set(1);
-            feedGate.turnToAngle(0);
+            feedGate.turnToAngle(MIN_ANGLE);
         } else if (half > 0.1) { // bottom half intake (motor only)
             intakeMotor.set(half);
-            feedGate.turnToAngle(90);
+            feedGate.turnToAngle(MAX_ANGLE);
         } else if (half < -0.1) { // full outtake
             intakeMotor.set(half);
-            feedGate.turnToAngle(90);
+            feedGate.turnToAngle(MAX_ANGLE);
         } else { // stop
             intakeMotor.set(0);
-            feedGate.turnToAngle(90);
+            feedGate.turnToAngle(MAX_ANGLE);
         }
     }
 
@@ -112,12 +118,12 @@ public class Intake implements Subsystem {
             public boolean run(@NonNull TelemetryPacket packet) {
                 // set intake and feeder power
                 intakeMotor.set(power);
-                feedGate.turnToAngle(0);
+                feedGate.turnToAngle(MIN_ANGLE);
 
                 // stop after time has elapsed
                 if (timer.milliseconds() >= time) {
                     intakeMotor.set(0);
-                    feedGate.turnToAngle(90);
+                    feedGate.turnToAngle(MAX_ANGLE);
                     return false;
                 } else {
                     return true;
@@ -138,7 +144,7 @@ public class Intake implements Subsystem {
                 if (timer.milliseconds() >= delay) {
                     // set intake and feeder power
                     intakeMotor.set(power);
-                    feedGate.turnToAngle(0);
+                    feedGate.turnToAngle(MIN_ANGLE);
                     return false;
                 } else {
                     return true;
@@ -155,7 +161,7 @@ public class Intake implements Subsystem {
             public boolean run(@NonNull TelemetryPacket packet) {
                 // set intake and feeder power
                 intakeMotor.set(power);
-                feedGate.turnToAngle(0);
+                feedGate.turnToAngle(MIN_ANGLE);
 
                 return false;
             }
@@ -172,7 +178,7 @@ public class Intake implements Subsystem {
             public boolean run(@NonNull TelemetryPacket packet) {
                 // set intake and feeder power
                 intakeMotor.set(power);
-                feedGate.turnToAngle(90);
+                feedGate.turnToAngle(MAX_ANGLE);
 
                 // stop after delay has elapsed
                 return timer.milliseconds() < delay;
@@ -188,7 +194,7 @@ public class Intake implements Subsystem {
             public boolean run(@NonNull TelemetryPacket packet) {
                 // set intake and feeder power
                 intakeMotor.set(power);
-                feedGate.turnToAngle(90);
+                feedGate.turnToAngle(MAX_ANGLE);
 
                 return false;
             }
