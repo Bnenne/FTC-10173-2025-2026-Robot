@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
+
 public class Constants {
     public static class Drive {
         // PID constants for heading lock
@@ -8,9 +11,21 @@ public class Constants {
         public static final double HEADING_KD = 0.0;
     }
 
+    public static class ShootingPoses {
+        public static final Pose2d BLUE_CLOSE = new Pose2d(-18, -18, Math.toRadians(225));
+        public static final Pose2d RED_CLOSE = new Pose2d(-18, 18, Math.toRadians(135));
+        public static final Pose2d BLUE_FAR = new Pose2d(52, -16, Math.toRadians(204));
+        public static final Pose2d RED_FAR = new Pose2d(52, 16, Math.toRadians(156));
+    }
+
+    public static class ShootingPower {
+        public static final double CLOSE = 0.41;
+        public static final double FAR = 0.49;
+    }
+
     public static class Gate {
-        public static final double MIN_ANGLE = 0;
-        public static final double MAX_ANGLE = 90;
+        public static final double OPEN_ANGLE = 0;
+        public static final double CLOSED_ANGLE = 90;
     }
 
     public static class Hood {
