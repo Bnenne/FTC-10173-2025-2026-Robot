@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.robot.autos;
+package org.firstinspires.ftc.teamcode.robot.autos.old;
 
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -14,13 +14,13 @@ import org.firstinspires.ftc.teamcode.robot.Robot;
 import org.firstinspires.ftc.teamcode.robot.RobotState;
 import org.firstinspires.ftc.teamcode.Roadrunner.tuning.TuningOpModes;
 
-@Autonomous(name="RedSmall", group="2025-2026")
-public final class RedSmall extends LinearOpMode {
+@Autonomous(name="RedLarge", group="2025-2026")
+public final class RedLarge extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
         // starting pose
-        Pose2d beginPose = new Pose2d(64, 16, Math.toRadians(180));
+        Pose2d beginPose = new Pose2d(-54, 48, Math.toRadians(180-45));
 
         if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) {
             MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
@@ -35,42 +35,42 @@ public final class RedSmall extends LinearOpMode {
                                     // move and shoot
                                     new ParallelAction(
                                             drive.actionBuilder(beginPose)
-                                                    .strafeToLinearHeading(new Vector2d(52, 16), Math.toRadians(180-24))
+                                                    .strafeToLinearHeading(new Vector2d(-18, 18), Math.toRadians(180-45))
                                                     .build(),
                                             new SequentialAction(
-                                                    robot.shooter.spinUp(0.49, 0.5),
-                                                    robot.intake.feed(1, 10000),
+                                                    robot.shooter.spinUp(0.41, 0.5),
+                                                    robot.intake.feed(1, 8500),
                                                     robot.shooter.spinUp(0.0, -1)
                                             )
                                     ),
 
                                     // align with artifacts
-                                    drive.actionBuilder(new Pose2d(52, 16, Math.toRadians(180-24)))
-                                            .strafeToLinearHeading(new Vector2d(33, 18), Math.toRadians(180-85))
+                                    drive.actionBuilder(new Pose2d(-18, 18, Math.toRadians(180-45)))
+                                            .strafeToLinearHeading(new Vector2d(-10, 18), Math.toRadians(180-99))
                                             .build(),
 
                                     // intake artifacts
                                     robot.intake.intake(1),
-                                    drive.actionBuilder(new Pose2d(33, 18, Math.toRadians(180-85)))
-                                            .strafeToLinearHeading(new Vector2d(33, 60), Math.toRadians(180-90), new TranslationalVelConstraint(25))
+                                    drive.actionBuilder(new Pose2d(-10, 18, Math.toRadians(180-99)))
+                                            .strafeToLinearHeading(new Vector2d(-10, 55), Math.toRadians(180-99), new TranslationalVelConstraint(17.5))
                                             .build(),
                                     robot.intake.intake(0),
 
                                     // move and shoot
                                     new ParallelAction(
-                                            drive.actionBuilder(new Pose2d(33, 60, Math.toRadians(180-90)))
-                                                    .strafeToLinearHeading(new Vector2d(52, 13), Math.toRadians(180-6))
+                                            drive.actionBuilder(new Pose2d(-10, 55, Math.toRadians(180-99)))
+                                                    .strafeToLinearHeading(new Vector2d(-18, 18), Math.toRadians(180-45))
                                                     .build(),
                                             new SequentialAction(
-                                                    robot.shooter.spinUp(0.49, 0.75),
+                                                    robot.shooter.spinUp(0.41, 0.75),
                                                     robot.intake.feed(1, 22500),
                                                     robot.shooter.spinUp(0.0, -1)
                                             )
                                     ),
 
                                     // Move off white line
-                                    drive.actionBuilder(new Pose2d(52, 13, Math.toRadians(180-6)))
-                                            .strafeToLinearHeading(new Vector2d(40, 13), Math.toRadians(180-6))
+                                    drive.actionBuilder(new Pose2d(-18, 18, Math.toRadians(180-40)))
+                                            .strafeToLinearHeading(new Vector2d(-48, 18), Math.toRadians(180))
                                             .build()
                             ),
                             robot.shooter.maintainVelocity()
