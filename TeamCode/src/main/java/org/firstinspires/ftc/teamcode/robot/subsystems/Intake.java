@@ -1,29 +1,44 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems;
 
+import static org.firstinspires.ftc.teamcode.robot.Constants.Gate.MAX_ANGLE;
+import static org.firstinspires.ftc.teamcode.robot.Constants.Gate.MIN_ANGLE;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.arcrobotics.ftclib.hardware.ServoEx;
+import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.robot.Constants;
 import org.firstinspires.ftc.teamcode.robot.DriverControls;
 
 public class Intake implements Subsystem {
 
     Motor intakeMotor;
-    CRServo feederServo;
+    ServoEx feedGate;
     DriverControls controls;
 
     // TeleOp constructor
     public Intake(HardwareMap hardwareMap, DriverControls controls) {
-        // initialize motors and servos
+        // initialize motor
         intakeMotor = new Motor(hardwareMap, "intake", Motor.GoBILDA.RPM_435);
         intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        feederServo = new CRServo(hardwareMap, "feeder");
+
+        // initialize gate servo
+        feedGate = new SimpleServo(
+                hardwareMap, "servo_name", Constants.Hood.MIN_ANGLE, Constants.Hood.MAX_ANGLE, AngleUnit.DEGREES
+        );
+
+        // configure gate servo
+        feedGate.setInverted(false);
+        feedGate.setPosition(0);
 
         // store driver controls
         this.controls = controls;
@@ -31,10 +46,18 @@ public class Intake implements Subsystem {
 
     // Autonomous constructor
     public Intake(HardwareMap hardwareMap) {
-        // initialize motors and servos
+        // initialize motor
         intakeMotor = new Motor(hardwareMap, "intake", Motor.GoBILDA.RPM_435);
         intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        feederServo = new CRServo(hardwareMap, "feeder");
+
+        // initialize gate servo
+        feedGate = new SimpleServo(
+                hardwareMap, "servo_name", Constants.Hood.MIN_ANGLE, Constants.Hood.MAX_ANGLE, AngleUnit.DEGREES
+        );
+
+        // configure gate servo
+        feedGate.setInverted(false);
+        feedGate.setPosition(0);
     }
 
     // periodic method to be called in main loop
@@ -42,42 +65,40 @@ public class Intake implements Subsystem {
         // set intake and feeder power based on driver controls
         setPower(
                 controls.intakePower(),
-                controls.fullIntakePressed(),
-                controls.topOuttakePressed()
+                controls.fullIntakePressed()
         );
     }
 
     public boolean isHealthy() {
-        return intakeMotor != null && feederServo != null;
+        return intakeMotor != null && feedGate != null;
     }
 
     public void stop() {
         intakeMotor.set(0);
-        feederServo.set(0);
+        feedGate.turnToAngle(0);
     }
 
     public void updateTelemetry(Telemetry telemetry) {
         telemetry.addLine();
         telemetry.addData(getName() + " Intake Power", "%.2f", intakeMotor.get());
-        telemetry.addData(getName() + " Feeder Power", "%.2f", feederServo.get());
+        telemetry.addData(getName() + " Gate Angle", "%.2f", feedGate.getAngle(AngleUnit.DEGREES));
         telemetry.addData(getName() + " Healthy", isHealthy());
     }
 
     // set intake and feeder power
-    public void setPower(double half, boolean full, boolean top) {
+    public void setPower(double half, boolean full) {
         if (full) { // full intake
             intakeMotor.set(1);
-            feederServo.set(-1);
+            feedGate.turnToAngle(0);
         } else if (half > 0.1) { // bottom half intake (motor only)
             intakeMotor.set(half);
+            feedGate.turnToAngle(90);
         } else if (half < -0.1) { // full outtake
             intakeMotor.set(half);
-            feederServo.set(-half);
-        } else if (top) { // top feeder only in reverse
-            feederServo.set(1);
+            feedGate.turnToAngle(90);
         } else { // stop
             intakeMotor.set(0);
-            feederServo.set(0);
+            feedGate.turnToAngle(90);
         }
     }
 
@@ -91,12 +112,12 @@ public class Intake implements Subsystem {
             public boolean run(@NonNull TelemetryPacket packet) {
                 // set intake and feeder power
                 intakeMotor.set(power);
-                feederServo.set(-power);
+                feedGate.turnToAngle(0);
 
                 // stop after time has elapsed
                 if (timer.milliseconds() >= time) {
                     intakeMotor.set(0);
-                    feederServo.set(0);
+                    feedGate.turnToAngle(90);
                     return false;
                 } else {
                     return true;
@@ -117,7 +138,7 @@ public class Intake implements Subsystem {
                 if (timer.milliseconds() >= delay) {
                     // set intake and feeder power
                     intakeMotor.set(power);
-                    feederServo.set(-power);
+                    feedGate.turnToAngle(0);
                     return false;
                 } else {
                     return true;
@@ -134,7 +155,7 @@ public class Intake implements Subsystem {
             public boolean run(@NonNull TelemetryPacket packet) {
                 // set intake and feeder power
                 intakeMotor.set(power);
-                feederServo.set(-power);
+                feedGate.turnToAngle(0);
 
                 return false;
             }
@@ -151,7 +172,7 @@ public class Intake implements Subsystem {
             public boolean run(@NonNull TelemetryPacket packet) {
                 // set intake and feeder power
                 intakeMotor.set(power);
-                feederServo.set(-power);
+                feedGate.turnToAngle(90);
 
                 // stop after delay has elapsed
                 return timer.milliseconds() < delay;
@@ -167,7 +188,7 @@ public class Intake implements Subsystem {
             public boolean run(@NonNull TelemetryPacket packet) {
                 // set intake and feeder power
                 intakeMotor.set(power);
-                feederServo.set(-power);
+                feedGate.turnToAngle(90);
 
                 return false;
             }
