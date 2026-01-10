@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Actions;
 import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -20,6 +21,7 @@ public class Intake implements Subsystem {
     Motor intakeMotor;
     ServoEx feedGate;
     DriverControls controls;
+    double beginTs = -1;
     
     double OPEN_ANGLE;
     double CLOSED_ANGLE;
@@ -52,16 +54,20 @@ public class Intake implements Subsystem {
     public Intake(HardwareMap hardwareMap) {
         // initialize motor
         intakeMotor = new Motor(hardwareMap, "intake", Motor.GoBILDA.RPM_435);
+
         intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setInverted(true);
+
+        OPEN_ANGLE = Constants.Gate.OPEN_ANGLE;
+        CLOSED_ANGLE = Constants.Gate.CLOSED_ANGLE;
 
         // initialize gate servo
         feedGate = new SimpleServo(
-                hardwareMap, "feedGate", OPEN_ANGLE, CLOSED_ANGLE, AngleUnit.DEGREES
+                hardwareMap, "feedGate", Constants.Gate.MIN_ANGLE, Constants.Gate.MAX_ANGLE, AngleUnit.DEGREES
         );
 
         // configure gate servo
         feedGate.setInverted(false);
-        feedGate.setPosition(0);
     }
 
     // periodic method to be called in main loop
@@ -79,7 +85,6 @@ public class Intake implements Subsystem {
 
     public void stop() {
         intakeMotor.set(0);
-        feedGate.turnToAngle(OPEN_ANGLE);
     }
 
     public void updateTelemetry(Telemetry telemetry) {
@@ -109,19 +114,25 @@ public class Intake implements Subsystem {
     // feed for a certain time
     public Action feed(double power, double time) {
         return new Action() {
-            // timer to track elapsed time
-            final ElapsedTime timer = new ElapsedTime();
-
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
+                double t;
+                if (beginTs < 0) {
+                    beginTs = Actions.now();
+                    t = 0;
+                } else {
+                    t = Actions.now() - beginTs;
+                }
+
                 // set intake and feeder power
                 intakeMotor.set(power);
                 feedGate.turnToAngle(OPEN_ANGLE);
 
                 // stop after time has elapsed
-                if (timer.milliseconds() >= time) {
+                if (t >= time) {
                     intakeMotor.set(0);
                     feedGate.turnToAngle(CLOSED_ANGLE);
+                    beginTs = -1;
                     return false;
                 } else {
                     return true;
@@ -133,16 +144,22 @@ public class Intake implements Subsystem {
     // feed after a delay
     public Action feedDelay(double power, double delay) {
         return new Action() {
-            // timer to track elapsed time
-            final ElapsedTime timer = new ElapsedTime();
-
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
+                double t;
+                if (beginTs < 0) {
+                    beginTs = Actions.now();
+                    t = 0;
+                } else {
+                    t = Actions.now() - beginTs;
+                }
+
                 // start feeding after delay
-                if (timer.milliseconds() >= delay) {
+                if (t >= delay) {
                     // set intake and feeder power
                     intakeMotor.set(power);
                     feedGate.turnToAngle(OPEN_ANGLE);
+                    beginTs = -1;
                     return false;
                 } else {
                     return true;
@@ -169,17 +186,26 @@ public class Intake implements Subsystem {
     // intake for a certain time
     public Action intake(double power, double delay) {
         return new Action() {
-            // timer to track elapsed time
-            final ElapsedTime timer = new ElapsedTime();
-
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
+                double t;
+                if (beginTs < 0) {
+                    beginTs = Actions.now();
+                    t = 0;
+                } else {
+                    t = Actions.now() - beginTs;
+                }
+
                 // set intake and feeder power
                 intakeMotor.set(power);
                 feedGate.turnToAngle(CLOSED_ANGLE);
 
-                // stop after delay has elapsed
-                return timer.milliseconds() < delay;
+                if (t >= delay) {
+                    beginTs = -1;
+                    return false;
+                } else {
+                    return true;
+                }
             }
         };
     }

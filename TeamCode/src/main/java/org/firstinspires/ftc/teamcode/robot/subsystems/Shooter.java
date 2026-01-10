@@ -91,7 +91,7 @@ public class Shooter implements Subsystem {
         );
 
         // configure motor settings
-        flywheel.setInverted(true);
+        flywheel.setInverted(false);
         flywheel.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         flywheel.setRunMode(Motor.RunMode.VelocityControl);
 

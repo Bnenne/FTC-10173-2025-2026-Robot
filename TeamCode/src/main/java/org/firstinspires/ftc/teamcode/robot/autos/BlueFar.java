@@ -25,10 +25,10 @@ public final class BlueFar extends LinearOpMode {
         waitForStart();
 
         autoBuilder
-                .moveAndShoot(FAR_SHOOTER_POWER, 5000, BLUE_FAR)
+                .moveAndShoot(FAR_SHOOTER_POWER, 5, BLUE_FAR)
                 .alignWithArtifacts(21)
                 .straightIntake()
-                .moveAndShoot(FAR_SHOOTER_POWER, 5000, BLUE_FAR)
+                .moveAndShoot(FAR_SHOOTER_POWER, 5, BLUE_FAR)
                 .build();
     }
 }

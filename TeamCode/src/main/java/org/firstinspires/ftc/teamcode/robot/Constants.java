@@ -19,8 +19,8 @@ public class Constants {
     }
 
     public static class ShootingPower {
-        public static final double CLOSE = 0.41;
-        public static final double FAR = 0.49;
+        public static final double CLOSE = 0.409;
+        public static final double FAR = 0.463;
     }
 
     public static class Gate {

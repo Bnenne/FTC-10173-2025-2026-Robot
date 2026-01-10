@@ -68,6 +68,7 @@ public class AutoBuilder {
         robotState = new RobotState();
         robot = new Robot(hardwareMap, robotState);
         currentPose = beginPose;
+        drive.localizer.setPose(beginPose);
         this.alliance = alliance;
         actions = new ArrayList<>();
     }
@@ -91,11 +92,8 @@ public class AutoBuilder {
                             new SequentialAction(
                                     // move to new pose
                                     drive.actionBuilder(currentPose)
-                                            .strafeToLinearHeading(new Vector2d(newPose.position.x, newPose.position.y), newPose.heading.real)
-                                            .build(),
-
-                                    // update pose after moving
-                                    updatePose(newPose)
+                                            .strafeToLinearHeading(new Vector2d(newPose.position.x, newPose.position.y), newPose.heading.toDouble())
+                                            .build()
                             ),
 
                             // spin up shooter while moving
@@ -109,6 +107,8 @@ public class AutoBuilder {
                     )
             )
         );
+
+        currentPose = newPose;
 
         return this;
     }
@@ -125,23 +125,21 @@ public class AutoBuilder {
 
                     // strafe through artifacts
                     drive.actionBuilder(currentPose)
-                            .strafeToLinearHeading(new Vector2d(currentPose.position.x, strafeY), currentPose.heading.real, new TranslationalVelConstraint(17.5))
+                            .strafeToLinearHeading(new Vector2d(currentPose.position.x, strafeY), currentPose.heading.toDouble(), new TranslationalVelConstraint(17.5))
                             .build(),
-
-                    // update pose after intaking
-                    updatePose(new Pose2d(currentPose.position.x, strafeY, currentPose.heading.real)),
 
                     // stop intake
                     robot.intake.intake(0)
             )
         );
 
+        currentPose = new Pose2d(currentPose.position.x, strafeY, currentPose.heading.toDouble());
+
         return this;
     }
 
     public AutoBuilder alignWithArtifacts(int patternID) {
 
-        // TODO: create align with artifacts action based on alliance
         double intakeX = IntakePose.fromId(patternID).getX();
 
         double intakeY = (alliance == Alliance.BLUE) ? -18 : 18;
@@ -153,27 +151,13 @@ public class AutoBuilder {
                         // strafe to intake position
                         drive.actionBuilder(currentPose)
                                 .strafeToLinearHeading(new Vector2d(intakeX, intakeY), Math.toRadians(intakeHeading))
-                                .build(),
-
-                        // update pose after intaking
-                        updatePose(new Pose2d(intakeX, intakeY, Math.toRadians(intakeHeading)))
+                                .build()
                 )
         );
 
+        currentPose = new Pose2d(intakeX, intakeY, Math.toRadians(intakeHeading));
+
         return this;
-    }
-
-    public Action updatePose(Pose2d pose) {
-        return new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                // update the current pose
-                currentPose = pose;
-
-                // returns false to indicate action is complete
-                return false;
-            }
-        };
     }
 
     public List<Action> getActions() {
