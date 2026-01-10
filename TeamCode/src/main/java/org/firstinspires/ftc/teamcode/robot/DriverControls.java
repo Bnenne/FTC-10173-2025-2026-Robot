@@ -10,7 +10,7 @@ public class DriverControls {
         this.driver = driver;
     }
 
-    public boolean imuResetPressed() {
+    public boolean yawResetPressed() {
         return driver.getButton(GamepadKeys.Button.BACK);
     }
 

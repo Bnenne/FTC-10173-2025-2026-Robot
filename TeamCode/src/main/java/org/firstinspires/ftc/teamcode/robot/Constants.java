@@ -24,19 +24,21 @@ public class Constants {
     }
 
     public static class Gate {
-        public static final double OPEN_ANGLE = 0;
-        public static final double CLOSED_ANGLE = 90;
+        public static final double MIN_ANGLE = 0;
+        public static final double MAX_ANGLE = 100;
+        public static final double OPEN_ANGLE = 83;
+        public static final double CLOSED_ANGLE = 93;
     }
 
     public static class Hood {
         public static final double MIN_ANGLE = 0;
-        public static final double MAX_ANGLE = 90;
+        public static final double MAX_ANGLE = 1;
     }
 
     public static class Shooter {
         // Shooter velocity control constants
-        public static final double SCALE = 670;
-        public static final double INTERCEPT = 85;
+        public static final double SCALE = 1000;
+        public static final double INTERCEPT = 150;
         public static final double MAX_RPM = 2400;
         public static final double VELOCITY_TOLERANCE = 20;
 

@@ -20,9 +20,10 @@ public class Drive implements Subsystem {
     MecanumDrive drive;
     DriverControls controls;
     Limelight limelight;
-    IMU imu;
     double lock_turn;
     PIDController pid;
+    IMU imu;
+    private boolean lastYawReset = false;
 
     // TeleOp constructor
     public Drive(HardwareMap hardwareMap, DriverControls controls, Limelight limelight, IMU imu) {
@@ -32,11 +33,11 @@ public class Drive implements Subsystem {
         // store driver controls
         this.controls = controls;
 
-        // store limelight
-        this.limelight = limelight;
-
         // store imu
         this.imu = imu;
+
+        // store limelight
+        this.limelight = limelight;
 
         // initialize pid controller for heading lock
         pid = new PIDController(
@@ -51,11 +52,11 @@ public class Drive implements Subsystem {
         // initialize drive with starting pose at origin
         drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
-        // store limelight
-        this.limelight = limelight;
-
         // store imu
         this.imu = imu;
+
+        // store limelight
+        this.limelight = limelight;
 
         // initialize pid controller for heading lock
         pid = new PIDController(
@@ -67,16 +68,19 @@ public class Drive implements Subsystem {
 
     // periodic method to be called in main loop
     public void periodic() {
-        // reset imu yaw
-        if (controls.imuResetPressed()) {
+        boolean yawReset = controls.yawResetPressed();
+
+        // reset yaw
+        if (yawReset && !lastYawReset) {
             resetYaw();
         }
+        lastYawReset = yawReset;
 
         // update heading lock
         if (controls.lockDrivePressed()) {
             Results results = limelight.results;
             if (results.hasTarget) { // if the limelight sees a tag
-                lock(limelight.results.tx);
+                lock(-limelight.results.tx);
             }
         }
 
@@ -91,7 +95,7 @@ public class Drive implements Subsystem {
     }
 
     public boolean isHealthy() {
-        return drive != null && imu != null;
+        return drive != null;
     }
 
     public void stop() {
@@ -100,11 +104,14 @@ public class Drive implements Subsystem {
 
     public void updateTelemetry(org.firstinspires.ftc.robotcore.external.Telemetry telemetry) {
         Pose2d pose = getPose();
+        double heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         telemetry.addLine();
         telemetry.addData(getName() + " X (Inches)", "%.2f", pose.position.x);
         telemetry.addData(getName() + " Y (Inches)", "%.2f", pose.position.y);
         telemetry.addData(getName() + " Heading (Degrees)", "%.2f", Math.toDegrees(pose.heading.real));
-        telemetry.addData(getName() + " IMU Yaw (Degrees)", "%.2f", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+        telemetry.addData(getName() + " Heading (Radians)", "%.2f", pose.heading.real);
+        telemetry.addData(getName() + " IMU (Degrees)", "%.2f", Math.toDegrees(heading));
+        telemetry.addData(getName() + " IMU (Radians)", "%.2f", heading);
         telemetry.addData(getName() + " Healthy", isHealthy());
     }
 

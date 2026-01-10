@@ -28,19 +28,21 @@ public class Intake implements Subsystem {
     public Intake(HardwareMap hardwareMap, DriverControls controls) {
         // initialize motor
         intakeMotor = new Motor(hardwareMap, "intake", Motor.GoBILDA.RPM_435);
+
+        // configure motor settings
         intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setInverted(true);
         
         OPEN_ANGLE = Constants.Gate.OPEN_ANGLE;
         CLOSED_ANGLE = Constants.Gate.CLOSED_ANGLE;
 
         // initialize gate servo
         feedGate = new SimpleServo(
-                hardwareMap, "feedGate", OPEN_ANGLE, CLOSED_ANGLE, AngleUnit.DEGREES
+                hardwareMap, "feedGate", Constants.Gate.MIN_ANGLE, Constants.Gate.MAX_ANGLE, AngleUnit.DEGREES
         );
 
         // configure gate servo
         feedGate.setInverted(false);
-        feedGate.setPosition(0);
 
         // store driver controls
         this.controls = controls;
@@ -54,7 +56,7 @@ public class Intake implements Subsystem {
 
         // initialize gate servo
         feedGate = new SimpleServo(
-                hardwareMap, "servo_name", OPEN_ANGLE, CLOSED_ANGLE, AngleUnit.DEGREES
+                hardwareMap, "feedGate", OPEN_ANGLE, CLOSED_ANGLE, AngleUnit.DEGREES
         );
 
         // configure gate servo

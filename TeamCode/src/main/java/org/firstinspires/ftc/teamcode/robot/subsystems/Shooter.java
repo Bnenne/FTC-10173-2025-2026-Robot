@@ -43,7 +43,7 @@ public class Shooter implements Subsystem {
         );
 
         // configure motor settings
-        flywheel.setInverted(true);
+        flywheel.setInverted(false);
         flywheel.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         flywheel.setRunMode(Motor.RunMode.VelocityControl);
 
@@ -61,7 +61,7 @@ public class Shooter implements Subsystem {
 
         // initialize hood servo
         hood = new SimpleServo(
-                hardwareMap, "servo_name", MIN_ANGLE, MAX_ANGLE, AngleUnit.DEGREES
+                hardwareMap, "hood", MIN_ANGLE, MAX_ANGLE, AngleUnit.DEGREES
         );
 
         // configure hood servo
@@ -126,7 +126,7 @@ public class Shooter implements Subsystem {
     // periodic method to be called in main loop
     public void periodic() {
         // adjust power based on tag distance
-        setPower(limelight.results.distanceMeters);
+        setPower(limelight.results.distanceMeters * 39.37);
 
         // set flywheel spin based on driver controls
         spin(controls.spinShooterPressed());
